@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Likoil Bonus</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="enter">Вход</string>
+    <string name="history">История заливов</string>
+</resources>
