@@ -16,7 +16,7 @@
             android:text="@string/login" />
 
         <EditText
-            android:text="9285100611"
+
             android:id="@+id/edLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:inputType="number" />
 
         <EditText
-            android:text="123456"
+
             android:id="@+id/edPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

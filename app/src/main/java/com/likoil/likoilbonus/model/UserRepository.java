@@ -23,6 +23,7 @@ public class UserRepository {
 
     public boolean isAuth() {
         String token = mSettings.getString(APP_PREFERENCES_API_TOKEN, null);
+//        return false;
         return token != null;
     }
 

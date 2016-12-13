@@ -1,6 +1,5 @@
 package com.likoil.likoilbonus.mvp.presentation.presenter;
 
-import com.likoil.likoilbonus.R;
 import com.likoil.likoilbonus.app.MyApp;
 import com.likoil.likoilbonus.model.UserRepository;
 import com.likoil.likoilbonus.mvp.network.ServerAPI;
@@ -32,7 +31,13 @@ public class StatusPresenter extends MvpPresenter<StatusView> {
             @Override
             public void onResponse(Call<StatusData> call, Response<StatusData> response) {
                 getViewState().hideLoading();
-                getViewState().setUserInfo(response.body());
+
+                if (response.code() == 401) {
+                    userRepository.clearAuth();
+
+                } else if (response.code() == 200) {
+                    getViewState().setUserInfo(response.body());
+                }
             }
 
             @Override
