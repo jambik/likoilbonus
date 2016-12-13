@@ -1,6 +1,5 @@
 package com.likoil.likoilbonus.mvp.presentation.presenter;
 
-import com.likoil.likoilbonus.R;
 import com.likoil.likoilbonus.app.MyApp;
 import com.likoil.likoilbonus.model.UserRepository;
 import com.likoil.likoilbonus.mvp.network.DiscountData;
