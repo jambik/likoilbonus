@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
@@ -34,6 +36,17 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, IRou
 
     @BindView(R.id.frameContainer)
     FrameLayout frameContainer;
+
+    private boolean isMenuHidden;
+
+    public boolean isMenuHidden() {
+        return isMenuHidden;
+    }
+
+    public void setMenuHidden(boolean menuHidden) {
+        isMenuHidden = menuHidden;
+        invalidateOptionsMenu();
+    }
 
     public static Intent getIntent(final Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -72,10 +85,23 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, IRou
     public void showFragment(String fragment, boolean animated) {
         MvpAppCompatFragment instance = null;
         if (SCREENS.SCREEN_HISTORY.equals(fragment)) {
-            instance = HistoryFragment.newInstance();
+            instance = HistoryFragment.newInstance(false);
             showFragment(instance, animated, true);
         } else if (SCREENS.SCREEN_STATUS.equals(fragment)) {
+            setMenuHidden(false);
             showFragment(StatusFragment.newInstance(), false, false);
+        } else  if (SCREENS.SCREEN_HISTORY_WITHDRAWAL.equals(fragment)) {
+            instance = HistoryFragment.newInstance(true);
+            showFragment(instance, animated, true);
+        }
+    }
+
+
+    private void clearBackStack() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
+            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
     }
 
@@ -93,11 +119,47 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, IRou
 
     @Override
     public void showAuth() {
+        clearBackStack();
         showFragment(LoginFragment.newInstance(), false, false);
+        setMenuHidden(true);
     }
 
     @Override
     public void showStatus() {
+        setMenuHidden(false);
         showFragment(StatusFragment.newInstance(), false, false);
+    }
+
+    @Override
+    public void restart() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (isMenuHidden()) {
+            return super.onCreateOptionsMenu(menu);
+        }
+        getMenuInflater().inflate(R.menu.status_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mExit:
+                MyApp.getInstance().getUserRepository().clearAuth();
+                restart();
+                break;
+            case R.id.mBonusLog:
+                MyApp.getRouter().showFragment(SCREENS.SCREEN_HISTORY_WITHDRAWAL, true);
+                break;
+            case R.id.mHistory:
+                MyApp.getRouter().showFragment(SCREENS.SCREEN_HISTORY, true);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

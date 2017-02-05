@@ -8,4 +8,5 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 
 public interface IRouter {
     void showFragment(String fragment, boolean animated);
+    void restart();
 }

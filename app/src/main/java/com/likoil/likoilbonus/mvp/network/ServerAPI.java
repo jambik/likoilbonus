@@ -19,4 +19,7 @@ public interface ServerAPI {
 
     @GET("user/discounts/")
     Call<DiscountData> userDiscounts(@Query("api_token") String token);
+
+    @GET("user/withdrawals/")
+    Call<WithdrawalsData> userWithdrawals(@Query("api_token") String token);
 }

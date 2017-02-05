@@ -1,5 +1,6 @@
 package com.likoil.likoilbonus.mvp.presentation.presenter;
 
+import com.google.gson.stream.MalformedJsonException;
 import com.likoil.likoilbonus.app.MyApp;
 import com.likoil.likoilbonus.model.UserRepository;
 import com.likoil.likoilbonus.mvp.network.ServerAPI;
@@ -25,6 +26,7 @@ public class StatusPresenter extends MvpPresenter<StatusView> {
         loadData();
     }
 
+
     private void loadData() {
         getViewState().showLoading();
         serverAPI.userInfo(userRepository.getToken()).enqueue(new Callback<StatusData>() {
@@ -34,7 +36,7 @@ public class StatusPresenter extends MvpPresenter<StatusView> {
 
                 if (response.code() == 401) {
                     userRepository.clearAuth();
-
+                    MyApp.getRouter().restart();
                 } else if (response.code() == 200) {
                     getViewState().setUserInfo(response.body());
                 }
@@ -43,6 +45,13 @@ public class StatusPresenter extends MvpPresenter<StatusView> {
             @Override
             public void onFailure(Call<StatusData> call, Throwable t) {
                 getViewState().hideLoading();
+
+                ///unauthorized
+
+                if (t instanceof MalformedJsonException) {
+                    userRepository.clearAuth();
+                    MyApp.getRouter().restart();
+                }
             }
         });
     }

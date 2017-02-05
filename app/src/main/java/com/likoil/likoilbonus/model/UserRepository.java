@@ -30,7 +30,11 @@ public class UserRepository {
     @SuppressLint("CommitPrefEdits")
     public void saveAuth(String token) {
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(APP_PREFERENCES_API_TOKEN, token);
+        if(token == null){
+            editor.remove(APP_PREFERENCES_API_TOKEN);
+        } else {
+            editor.putString(APP_PREFERENCES_API_TOKEN, token);
+        }
         editor.commit();
     }
 

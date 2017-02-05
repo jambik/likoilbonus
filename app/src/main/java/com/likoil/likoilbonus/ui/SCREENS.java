@@ -6,5 +6,6 @@ package com.likoil.likoilbonus.ui;
 
 public class SCREENS {
     public static String SCREEN_HISTORY = "SCREEN_HISTORY";
+    public static String SCREEN_HISTORY_WITHDRAWAL = "SCREEN_HISTORY_WITHDRAWAL";
     public static String SCREEN_STATUS = "SCREEN_STATUS";
 }

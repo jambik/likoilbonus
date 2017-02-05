@@ -13,6 +13,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.likoil.likoilbonus.R;
 import com.likoil.likoilbonus.mvp.network.DiscountData;
+import com.likoil.likoilbonus.mvp.network.WithdrawalsData;
 import com.likoil.likoilbonus.mvp.presentation.presenter.HistoryPresenter;
 import com.likoil.likoilbonus.mvp.presentation.view.HistoryView;
 
@@ -37,12 +38,16 @@ public class HistoryFragment extends MvpAppCompatFragment implements HistoryView
     View progressBar;
 
     private DiscountData discountData;
+    private WithdrawalsData withdrawalsData;
 
-    public static HistoryFragment newInstance() {
+    boolean isWithdrawalHistory;
+
+    public static HistoryFragment newInstance(boolean isWithdrawalHistory) {
         HistoryFragment fragment = new HistoryFragment();
 
         Bundle args = new Bundle();
         fragment.setArguments(args);
+        fragment.isWithdrawalHistory = isWithdrawalHistory;
 
         return fragment;
     }
@@ -53,7 +58,11 @@ public class HistoryFragment extends MvpAppCompatFragment implements HistoryView
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
 
-        recycleView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        LinearLayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
+        layout.setStackFromEnd(true);
+        recycleView.setLayoutManager(layout);
+
+        mHistoryPresenter.loadData(isWithdrawalHistory);
 
         return view;
     }
@@ -82,6 +91,13 @@ public class HistoryFragment extends MvpAppCompatFragment implements HistoryView
     }
 
     @Override
+    public void setWithdrawalsData(WithdrawalsData withdrawalsData) {
+        this.withdrawalsData = withdrawalsData;
+        MyAdapter myAdapter = new MyAdapter();
+        recycleView.setAdapter(myAdapter);
+    }
+
+    @Override
     public void showError(String error) {
 
     }
@@ -102,6 +118,11 @@ public class HistoryFragment extends MvpAppCompatFragment implements HistoryView
             txtInfo.setText(String.format("%s лит. - %s руб.", item.getVolume(), item.getAmount()));
             txtBonus.setText(String.format("Бонус - %s", item.getPoint()));
         }
+        void setWidthdrawItem(WithdrawalsData.WithdrawalItem item) {
+            txtDateStation.setText(String.format("%s", simpleDateFormat.format(item.getUse_at())));
+            txtInfo.setText(String.format("%s.", item.getAzs()));
+            txtBonus.setText(String.format("Количество - %s", item.getAmount()));
+        }
 
         DiscountViewHolder(View itemView) {
             super(itemView);
@@ -117,12 +138,21 @@ public class HistoryFragment extends MvpAppCompatFragment implements HistoryView
 
         @Override
         public void onBindViewHolder(DiscountViewHolder holder, int position) {
-            holder.setItem(discountData.getDiscounts().get(position));
+            if (discountData != null) {
+                holder.setItem(discountData.getDiscounts().get(position));
+            } else if (withdrawalsData != null) {
+                holder.setWidthdrawItem(withdrawalsData.getWithdrawals().get(position));
+            }
         }
 
         @Override
         public int getItemCount() {
-            return discountData.getDiscounts().size();
+            if (discountData != null) {
+                return discountData.getDiscounts().size();
+            } else if (withdrawalsData != null) {
+                return withdrawalsData.getWithdrawals().size();
+            }
+            return 0;
         }
     }
 }
